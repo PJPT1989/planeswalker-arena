@@ -131,10 +131,15 @@ func _process(dt: float) -> void:
 		col.a = 1.0 - k
 		var r: float = f[2] * (0.6 + k * 0.8)
 		var c: Vector3 = f[0]
-		var u := cup * r
-		var rr := cright * r
-		_tri(c - rr - u, c + rr - u, c + rr + u, col)
-		_tri(c - rr - u, c + rr + u, c - rr + u, col)
+		# a soft disc: bright in the middle, clear at the rim
+		var rim := Color(col, 0.0)
+		var n := 12
+		for i in n:
+			var a0 := TAU * i / n
+			var a1 := TAU * (i + 1) / n
+			var p0 := c + (cright * cos(a0) + cup * sin(a0)) * r
+			var p1 := c + (cright * cos(a1) + cup * sin(a1)) * r
+			_tri3(c, p0, p1, col, rim, rim)
 	_im.surface_end()
 
 
@@ -145,6 +150,15 @@ func _quad_line(a: Vector3, b: Vector3, w: float, col: Color, cp: Vector3) -> vo
 	var side := d.cross(cp - (a + b) * 0.5).normalized() * w * 0.5
 	_tri(a - side, b - side, b + side, col)
 	_tri(a - side, b + side, a + side, col)
+
+
+func _tri3(a: Vector3, b: Vector3, c: Vector3, ca: Color, cb: Color, cc: Color) -> void:
+	_im.surface_set_color(ca)
+	_im.surface_add_vertex(a)
+	_im.surface_set_color(cb)
+	_im.surface_add_vertex(b)
+	_im.surface_set_color(cc)
+	_im.surface_add_vertex(c)
 
 
 func _tri(a: Vector3, b: Vector3, c: Vector3, col: Color) -> void:

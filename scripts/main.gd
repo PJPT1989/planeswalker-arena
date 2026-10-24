@@ -137,6 +137,8 @@ func start_match(cfg: Dictionary) -> Match:
 	_stop_demo()
 	_clear_screen()
 	_close_pause()
+	if match_node:
+		match_node.queue_free()
 	match_node = Match.new()
 	match_node.process_mode = Node.PROCESS_MODE_PAUSABLE
 	add_child(match_node)
